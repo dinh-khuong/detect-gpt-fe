@@ -11,7 +11,9 @@ export default defineConfig({
         // The key is the name of the output file
         // The value is the path to the source HTML
         main: resolve(__dirname, 'index.html'),
-        admin: resolve(__dirname, 'login.html'),
+        login: resolve(__dirname, 'login.html'),
+        features: resolve(__dirname, 'features.html'),
+        pricing: resolve(__dirname, 'pricing.html'),
       },
     },
   },

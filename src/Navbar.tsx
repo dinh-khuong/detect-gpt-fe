@@ -15,6 +15,30 @@ import {
 import { useState } from "react"
 import { IoMenuOutline, IoCloseOutline } from "react-icons/io5"
 
+type NavLink = {
+  name: string,
+  link: string,
+}
+
+const LINKS: NavLink[] = [
+  {
+    name: 'Features',
+    link: './features'
+  },
+  {
+    name: 'Solutions',
+    link: './solutions',
+  },
+  {
+    name: 'Pricing',
+    link: './pricing'
+  },
+  {
+    name: 'Resources',
+    link: './resources'
+  }
+] 
+
 export default function Navbar() {
   const [open, setOpen] = useState(false)
 
@@ -32,15 +56,18 @@ export default function Navbar() {
           
           {/* Logo Section */}
           <HStack gap="2" fontWeight="bold" fontSize="xl" cursor="pointer">
-            <Box w="32px" h="32px" bg="orange.400" borderRadius="md" />
-            <Text>GPT Detector</Text>
+            <Link href="/">
+              <Box w="32px" h="32px" bg="orange.400" borderRadius="md" />
+              <Text>GPT Detector</Text>
+            </Link>
           </HStack>
 
           {/* Desktop Navigation */}
           <HStack as="nav" gap="8" display={{ base: 'none', md: 'flex' }}>
-            {['Features', 'Solutions', 'Pricing', 'Resources'].map((navItem) => (
+            {LINKS.map((navItem) => (
               <Link
-                key={navItem}
+                key={navItem.name}
+                href={navItem.link}
                 variant="plain" // v3 Link variant
                 fontWeight="medium"
                 _hover={{
@@ -50,7 +77,7 @@ export default function Navbar() {
                 }}
                 transition="all 0.2s"
               >
-                {navItem}
+                {navItem.name}
               </Link>
             ))}
           </HStack>

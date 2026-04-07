@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
 // This is the key: the ColorModeProvider snippet
 import { ColorModeProvider } from './components/ui/color-mode' 
@@ -15,7 +14,7 @@ createRoot(document.getElementById('root')!).render(
       */}
       <ColorModeProvider forcedTheme="dark">
         <Navbar />
-        <App />
+        {/* <App /> */}
       </ColorModeProvider>
     </ChakraProvider>
   </StrictMode>,
