@@ -5,7 +5,7 @@ import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
 // This is the key: the ColorModeProvider snippet
 import { ColorModeProvider } from './components/ui/color-mode' 
 import Navbar from './Navbar.tsx';
-import LoginPage from './pages/Login.tsx';
+import SignInPage from './pages/SignIn.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
       */}
       <ColorModeProvider forcedTheme="dark">
         <Navbar />
-        <LoginPage />
+        <SignInPage />
       </ColorModeProvider>
     </ChakraProvider>
   </StrictMode>,

@@ -12,6 +12,7 @@ export default defineConfig({
         // The value is the path to the source HTML
         main: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'login.html'),
+        signin: resolve(__dirname, 'signin.html'),
         features: resolve(__dirname, 'features.html'),
         pricing: resolve(__dirname, 'pricing.html'),
       },

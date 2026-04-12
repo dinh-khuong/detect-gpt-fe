@@ -23,19 +23,19 @@ type NavLink = {
 const LINKS: NavLink[] = [
   {
     name: 'Features',
-    link: './features'
+    link: '/features'
   },
   {
     name: 'Solutions',
-    link: './solutions',
+    link: '/solutions',
   },
   {
     name: 'Pricing',
-    link: './pricing'
+    link: '/pricing'
   },
   {
     name: 'Resources',
-    link: './resources'
+    link: '/resources'
   }
 ] 
 
@@ -84,9 +84,11 @@ export default function Navbar() {
 
           {/* Action Buttons */}
           <HStack gap="4">
-            <Button variant="ghost" display={{ base: 'none', md: 'inline-flex' }}>
-              Sign In
-            </Button>
+            <Link href="/signin">
+              <Button variant="ghost" display={{ base: 'none', md: 'inline-flex' }}>
+                Sign In
+              </Button>
+            </Link>
             <Button
               bg="orange.400"
               color="white"

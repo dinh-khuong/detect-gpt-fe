@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react"
 import { useState } from "react"
 import { IoTrashOutline } from "react-icons/io5"
+import userApi from "../api/userApi";
 
 // v3 Snippets
 
@@ -25,13 +26,18 @@ export default function DetectionDashboard() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [score, setScore] = useState(80)
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     setIsAnalyzing(true)
     // Simulate API call to your Python backend
-    setTimeout(() => {
-      setScore(Math.floor(Math.random() * 100))
-      setIsAnalyzing(false)
-    }, 30)
+    // setTimeout(() => {
+    //   setScore(Math.floor(Math.random() * 100))
+    //   setIsAnalyzing(false)
+    // }, 30)
+
+    const res = await userApi.detectAI(text);
+    console.log(res)
+    setScore(res.data["fast-gpt"] * 100)
+    setIsAnalyzing(false)
   }
 
   return (
