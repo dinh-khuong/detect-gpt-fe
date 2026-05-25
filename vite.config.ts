@@ -13,6 +13,8 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'login.html'),
         signin: resolve(__dirname, 'signin.html'),
+        register: resolve(__dirname, 'register.html'),
+        apiKey: resolve(__dirname, 'api-key.html'),
         features: resolve(__dirname, 'features.html'),
         pricing: resolve(__dirname, 'pricing.html'),
       },

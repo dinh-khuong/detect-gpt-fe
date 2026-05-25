@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 
-const appUrl = import.meta.env.VITE_BE_URL
+const appUrl = (import.meta.env.VITE_BE_URL || "/").replace(/\/?$/, "/")
 const axiosAuth = axios.create({
   baseURL: appUrl + "api/auth/",
   headers: {
@@ -56,4 +56,3 @@ export interface JwtTokens {
 }
 
 export default authApi;
-

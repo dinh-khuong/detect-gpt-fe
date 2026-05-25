@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 
-const appUrl = import.meta.env.VITE_BE_URL
+const appUrl = (import.meta.env.VITE_BE_URL || "/").replace(/\/?$/, "/")
 const axiosClient = axios.create({
   baseURL: appUrl + "api/",
   headers: {
@@ -27,14 +27,14 @@ axiosClient.interceptors.response.use(
     const originalRequest = error.config;
 
     // Check if error is 401 and we haven't tried refreshing yet
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem('refresh_token');
         
         // Call your refresh endpoint
-        const res = await axios.post(appUrl + "auth/refresh", {
+        const res = await axios.post(appUrl + "api/auth/refresh/", {
           refresh: refreshToken
         })
 
@@ -52,7 +52,7 @@ axiosClient.interceptors.response.use(
         // Refresh token is also invalid/expired -> Log user out
         console.error("Session expired. Please log in again.");
         localStorage.clear();
-        window.location.href = '/login';
+        window.location.href = '/signin';
         return Promise.reject(refreshError);
       }
     }
@@ -64,15 +64,43 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  api_key?: string;
+  apiKey?: string;
+  current_api_key?: string;
+  key?: string;
+  token?: string;
+}
+
+export interface ApiKeyResponse {
+  api_key?: string;
+  apiKey?: string;
+  current_api_key?: string;
+  key?: string;
+  token?: string;
+  apiKeyValue?: string;
+  value?: string;
+  user?: User;
+  data?: ApiKeyResponse;
+  results?: ApiKeyResponse[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface DetechAI {
-  'fast-gpt': number;
+  fast_gpt: number;
+  polarity: number;
+  subjectivity: number;
+  sentence_std: number;
 }
 
 const userApi = {
   getMe(): Promise<AxiosResponse<User>> {
-    const url = 'me/'
+    const url = 'auth/me/'
+
+    return axiosClient.get(url)
+  },
+  getCurrentApiKey(): Promise<AxiosResponse<ApiKeyResponse | ApiKeyResponse[] | string>> {
+    const url = 'api-key/'
 
     return axiosClient.get(url)
   },

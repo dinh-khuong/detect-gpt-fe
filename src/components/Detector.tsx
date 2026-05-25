@@ -17,14 +17,23 @@ import {
 } from "@chakra-ui/react"
 import { useState } from "react"
 import { IoTrashOutline } from "react-icons/io5"
-import userApi from "../api/userApi";
+import userApi, { type DetechAI } from "../api/userApi";
 
-// v3 Snippets
+const getVerdict = (score: number) => {
+  if (score <= 20) return { label: "Highly Human", color: "green", bg: "green.subtle" };
+  if (score <= 45) return { label: "Likely Human", color: "teal", bg: "teal.subtle" };
+  if (score <= 65) return { label: "Mixed / Unsure", color: "yellow", bg: "yellow.subtle" };
+  if (score <= 85) return { label: "Likely AI", color: "orange", bg: "orange.subtle" };
+  return { label: "Highly AI Generated", color: "red", bg: "red.subtle" };
+};
+
+const INIT_SCORE: DetechAI = { fast_gpt: 0, subjectivity: 0, polarity: 0, sentence_std: 0 }
 
 export default function DetectionDashboard() {
   const [text, setText] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [score, setScore] = useState(80)
+  const [score, setScore] = useState<DetechAI>(INIT_SCORE)
+  const verdict = getVerdict(score.fast_gpt)
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true)
@@ -34,9 +43,15 @@ export default function DetectionDashboard() {
     //   setIsAnalyzing(false)
     // }, 30)
 
-    const res = await userApi.detectAI(text);
-    console.log(res)
-    setScore(res.data["fast-gpt"] * 100)
+    try {
+      const res = await userApi.detectAI(text);
+      // const a = res.data["fast-gpt"]
+      console.log(res)
+      setScore(res.data)
+    } catch (error) {
+      console.log(error)
+      alert("Have error")
+    }
     setIsAnalyzing(false)
   }
 
@@ -72,14 +87,17 @@ export default function DetectionDashboard() {
                   <Text>{text.split(/\s+/).filter(Boolean).length} words</Text>
                 </HStack>
 
-              <HStack gap="3" justifyContent="center">
-                <Button colorPalette="orange" loading={isAnalyzing} onClick={handleAnalyze}>
-                  Analyze Text
-                </Button>
-                <Button variant="ghost" onClick={() => setText("")}>
-                  <IoTrashOutline /> Clear
-                </Button>
-              </HStack>
+                <HStack gap="3" justifyContent="center">
+                  <Button colorPalette="orange" loading={isAnalyzing} onClick={handleAnalyze}>
+                    Analyze Text
+                  </Button>
+                  <Button variant="ghost" onClick={() => {
+                    setText("")
+                    setScore(INIT_SCORE)
+                  }}>
+                    <IoTrashOutline /> Clear
+                  </Button>
+                </HStack>
               </Box>
             </Box>
 
@@ -87,23 +105,23 @@ export default function DetectionDashboard() {
             <Stack gap="6">
 
               {/* Score Card */}
-              <Box bg={score > 60 ? "red.subtle" : "green.subtle"} p="8" borderRadius="2xl" textAlign="center" border="1px solid" borderColor="orange.200">
+              <Box bg={verdict.bg} p="8" borderRadius="2xl" textAlign="center" border="1px solid" borderColor="orange.200">
                 <VStack gap="6">
                   <Heading size="md">Final Verdict</Heading>
 
                   <ProgressCircleRoot
-                    value={score}
+                    // value={score.fast_gpt}
                     // size="200px" 
-                    colorPalette={score > 60 ? "red" : "green"}
+                    colorPalette={verdict.color}
                   >
                     <ProgressCircleValueText fontSize="3xl" fontWeight="black">
-                      {score}%
+                      {score.fast_gpt.toFixed(2)}%
                     </ProgressCircleValueText>
                     <ProgressCircle.Circle width="15px" />
                   </ProgressCircleRoot>
 
                   <Text fontWeight="semibold" fontSize="lg">
-                    {score > 60 ? "Likely AI Generated" : "Likely Human Written"}
+                    {verdict.label}
                   </Text>
                 </VStack>
               </Box>
@@ -114,9 +132,16 @@ export default function DetectionDashboard() {
                   Detailed Breakdown
                 </Heading>
                 <VStack gap="6" align="stretch">
-                  <MetricBar label="Predictability" value={score + 5} color="orange" />
-                  <MetricBar label="Probability" value={score - 2} color="blue" />
-                  <MetricBar label="Burstiness" value={100 - score} color="purple" />
+                  <MetricBar label="Polarity" color="orange">
+                    {score.polarity.toFixed(2)}
+                  </MetricBar>
+                  <MetricBar label="Subjectivity" color="blue">
+                    {score.subjectivity.toFixed(2)}
+                  </MetricBar>
+                  <MetricBar label="Sentence length standard deviation" color="blue">
+                    {score.sentence_std.toFixed(2)}
+                  </MetricBar>
+                  {/* <MetricBar label="Burstiness" value={100 - score} color="purple" /> */}
                 </VStack>
               </Box>
 
@@ -129,11 +154,11 @@ export default function DetectionDashboard() {
 }
 
 // Sub-component for individual metric bars
-const MetricBar = ({ label, value, color }: { label: string, value: number, color: string }) => (
-  <ProgressCircle.Root value={value} colorPalette={color} size="sm">
+const MetricBar = ({ label, children, color }: { label: string, children: React.ReactNode, color: string }) => (
+  <ProgressCircle.Root colorPalette={color} size="sm">
     <Flex justify="space-between" mb="1">
       <Text fontSize="xs" fontWeight="bold">{label}:&nbsp;</Text>
-      <Text fontSize="xs">{value}%</Text>
+      <Text fontSize="xs">{children}</Text>
     </Flex>
     <ProgressCircle.Range borderRadius="full" />
   </ProgressCircle.Root>
