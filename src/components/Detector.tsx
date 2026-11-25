@@ -23,6 +23,7 @@ import { isAxiosError } from "axios"
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from "react"
 import { IoCloudUploadOutline, IoDocumentTextOutline, IoTrashOutline } from "react-icons/io5"
 import userApi, {
+  type BaseFeatures,
   type ChunkResult,
   type DetectMethod,
   type DetectMethodId,
@@ -52,6 +53,16 @@ const FALLBACK_METHODS: DetectMethod[] = [
   },
 ]
 const FALLBACK_EXTENSIONS = [".txt", ".md", ".pdf", ".docx", ".doc", ".odt", ".rtf", ".html", ".pptx", ".xlsx", ".epub", ".csv", ".json"]
+
+const BASE_LABELS: [keyof BaseFeatures, string, number][] = [
+  ["flesch", "Flesch reading ease", 2],
+  ["gunning_fog", "Gunning fog index", 2],
+  ["ttr", "Type-token ratio", 3],
+  ["sentence_std", "Sentence length std", 2],
+  ["polarity", "Polarity", 3],
+  ["subjectivity", "Subjectivity", 3],
+  ["punct", "Dash ratio ('-')", 4],
+]
 
 const getVerdict = (score: number) => {
   if (score <= 20) return { label: "Highly Human", color: "green", bg: "green.subtle" };
@@ -349,8 +360,19 @@ export default function DetectionDashboard() {
                         </Progress.Track>
                       </Progress.Root>
                     </Box>
+                    {Object.keys(result.base ?? {}).length > 0 && (
+                      <>
+                        <Separator />
+                        <Text fontSize="xs" fontWeight="bold" color="fg.muted" textTransform="uppercase">
+                          Text features
+                        </Text>
+                        {BASE_LABELS.filter(([k]) => result.base[k] !== undefined).map(([k, label, digits]) => (
+                          <Metric key={k} label={label}>{result.base[k]!.toFixed(digits)}</Metric>
+                        ))}
+                      </>
+                    )}
                     <Text fontSize="xs" color="fg.subtle">
-                      Model: {result.model} · Logistic regression on {result.features.map((f) => f.replace(/^perf_/, "")).join(", ")}
+                      Model: {result.model} · Logistic regression on {result.features.map((f) => f.replace(/^(perf|base)_/, "")).join(", ")}
                       {result.cv_auc !== null ? ` (CV AUC ${result.cv_auc.toFixed(3)})` : ""}
                     </Text>
                   </VStack>

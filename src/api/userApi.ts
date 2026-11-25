@@ -122,6 +122,17 @@ export interface DocumentSource {
   n_chapters?: number;
 }
 
+/** Đặc trưng văn bản của mô hình cũ (rỗng nếu mô hình hồi quy không dùng) */
+export interface BaseFeatures {
+  ttr?: number;
+  punct?: number;
+  sentence_std?: number;
+  polarity?: number;
+  subjectivity?: number;
+  flesch?: number;
+  gunning_fog?: number;
+}
+
 export interface ChunkResult {
   index: number;
   start: number;
@@ -130,6 +141,7 @@ export interface ChunkResult {
   prob_mean: number;
   nll_mean: number;
   ppl: number;
+  base: BaseFeatures;
   score: number;
   is_ai: boolean;
 }
@@ -146,6 +158,7 @@ export interface ProbMeanResult extends DetectCommon {
   prob_mean: number;
   nll_mean: number;
   ppl: number;
+  base: BaseFeatures;
   prob_std: number;
   /** chỉ có khi mô hình hồi quy dùng đúng 1 đặc trưng prob_mean */
   threshold: number | null;
