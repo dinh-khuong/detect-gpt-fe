@@ -81,7 +81,7 @@ export default function LoginPage() {
 
           {/* Error Message Display */}
           {errorMsg && (
-            <Box p={3} bg="red.50" _dark={{ bg: "red.900/30" }} borderRadius="md" borderWidth="1px" borderColor="red.200" _dark={{ borderColor: "red.800" }}>
+            <Box p={3} bg="red.50" _dark={{ bg: "red.900/30", borderColor: "red.800" }} borderRadius="md" borderWidth="1px" borderColor="red.200">
               <Text color="red.600" _dark={{ color: "red.400" }} fontSize="sm" textAlign="center">
                 {errorMsg}
               </Text>
