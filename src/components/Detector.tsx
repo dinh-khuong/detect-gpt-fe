@@ -390,7 +390,7 @@ const SegmentView = ({ text, chunks }: { text: string, chunks: ChunkResult[] }) 
           <Badge>Human</Badge>
         </HStack>
       </HStack>
-      <Box maxH="500px" overflowY="auto" whiteSpace="pre-wrap" lineHeight="tall" fontSize="sm">
+      <Box maxH="500px" overflowY="auto" whiteSpace="pre-wrap" lineHeight="tall" fontSize="sm" textAlign="left">
         {chunks.map((c, i) => {
           const start = i === 0 ? 0 : c.start
           const end = i === chunks.length - 1 ? body.length : chunks[i + 1].start
