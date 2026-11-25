@@ -334,7 +334,11 @@ export default function DetectionDashboard() {
                     <Metric label="Mean token probability (prob_mean)">
                       {result.prob_mean.toFixed(4)}
                     </Metric>
-                    <Metric label="AI threshold">{result.threshold.toFixed(3)}</Metric>
+                    <Metric label="Mean NLL (cross-entropy)">{result.nll_mean.toFixed(4)}</Metric>
+                    <Metric label="Perplexity">{result.ppl.toFixed(2)}</Metric>
+                    {result.threshold !== null && (
+                      <Metric label="AI threshold (prob_mean)">{result.threshold.toFixed(3)}</Metric>
+                    )}
                     <Metric label="Tokens analyzed">{result.n_tokens.toLocaleString()}</Metric>
                     <Metric label="Segments">{result.n_chunks}</Metric>
                     <Box>
@@ -345,7 +349,10 @@ export default function DetectionDashboard() {
                         </Progress.Track>
                       </Progress.Root>
                     </Box>
-                    <Text fontSize="xs" color="fg.subtle">Model: {result.model}</Text>
+                    <Text fontSize="xs" color="fg.subtle">
+                      Model: {result.model} · Logistic regression on {result.features.map((f) => f.replace(/^perf_/, "")).join(", ")}
+                      {result.cv_auc !== null ? ` (CV AUC ${result.cv_auc.toFixed(3)})` : ""}
+                    </Text>
                   </VStack>
                 )}
 
@@ -400,7 +407,7 @@ const SegmentView = ({ text, chunks }: { text: string, chunks: ChunkResult[] }) 
               key={c.index}
               bg={chunkColor(c.score)}
               borderRadius="sm"
-              title={`Segment ${c.index + 1}: ${c.score.toFixed(1)}% AI · prob_mean ${c.prob_mean.toFixed(4)} · ${c.n_tokens} tokens`}
+              title={`Segment ${c.index + 1}: ${c.score.toFixed(1)}% AI · prob_mean ${c.prob_mean.toFixed(4)} · NLL ${c.nll_mean.toFixed(3)} · PPL ${c.ppl.toFixed(1)} · ${c.n_tokens} tokens`}
             >
               {text.slice(offset + start, offset + end)}
             </Box>

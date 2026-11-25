@@ -128,6 +128,8 @@ export interface ChunkResult {
   end: number;
   n_tokens: number;
   prob_mean: number;
+  nll_mean: number;
+  ppl: number;
   score: number;
   is_ai: boolean;
 }
@@ -142,8 +144,13 @@ export interface ProbMeanResult extends DetectCommon {
   method: "prob_mean";
   model: string;
   prob_mean: number;
+  nll_mean: number;
+  ppl: number;
   prob_std: number;
-  threshold: number;
+  /** chỉ có khi mô hình hồi quy dùng đúng 1 đặc trưng prob_mean */
+  threshold: number | null;
+  features: string[];
+  cv_auc: number | null;
   n_tokens: number;
   n_chunks: number;
   ai_fraction: number;
