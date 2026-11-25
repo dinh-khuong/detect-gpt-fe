@@ -93,6 +93,71 @@ export interface DetechAI {
   sentence_std: number;
 }
 
+export type DetectMethodId = "prob_mean" | "fastgpt";
+
+export interface DetectMethod {
+  id: DetectMethodId;
+  label: string;
+  description: string;
+  long_text: boolean;
+  default: boolean;
+  loaded: boolean;
+}
+
+export interface DetectMethodsResponse {
+  default: DetectMethodId;
+  methods: DetectMethod[];
+  supported_files: string[];
+  max_upload_mb: number;
+}
+
+export interface DocumentSource {
+  filename: string;
+  file_type: string;
+  n_chars: number;
+  n_words: number;
+  n_pages?: number;
+  n_slides?: number;
+  n_sheets?: number;
+  n_chapters?: number;
+}
+
+export interface ChunkResult {
+  index: number;
+  start: number;
+  end: number;
+  n_tokens: number;
+  prob_mean: number;
+  score: number;
+  is_ai: boolean;
+}
+
+interface DetectCommon {
+  score: number;
+  source?: DocumentSource;
+  text?: string;
+}
+
+export interface ProbMeanResult extends DetectCommon {
+  method: "prob_mean";
+  model: string;
+  prob_mean: number;
+  prob_std: number;
+  threshold: number;
+  n_tokens: number;
+  n_chunks: number;
+  ai_fraction: number;
+  truncated: boolean;
+  warnings: string[];
+  chunks: ChunkResult[];
+}
+
+export interface FastGptResult extends DetectCommon, DetechAI {
+  method: "fastgpt";
+}
+
+export type DetectResult = ProbMeanResult | FastGptResult;
+
 const userApi = {
   getMe(): Promise<AxiosResponse<User>> {
     const url = 'auth/me/'
@@ -108,9 +173,25 @@ const userApi = {
     const url = 'auth/refresh/'
     return axiosClient.get(url)
   },
-  detectAI(text: string): Promise<AxiosResponse<DetechAI>> {
+  detectAI(text: string, method?: DetectMethodId): Promise<AxiosResponse<DetectResult>> {
     const url = 'detect-ai/'
-    return axiosClient.post(url, { text })
+    return axiosClient.post(url, { text, method })
+  },
+  detectAIFile(file: File, method?: DetectMethodId): Promise<AxiosResponse<DetectResult>> {
+    const url = 'detect-ai/'
+    const form = new FormData()
+    form.append('file', file)
+    if (method) form.append('method', method)
+    // để trình duyệt tự đặt multipart boundary
+    return axiosClient.post(url, form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
+  extractText(file: File): Promise<AxiosResponse<{ text: string; source: DocumentSource }>> {
+    const form = new FormData()
+    form.append('file', file)
+    return axiosClient.post('extract-text/', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
+  getDetectMethods(): Promise<AxiosResponse<DetectMethodsResponse>> {
+    return axiosClient.get('detect-ai/methods/')
   }
 }
 
